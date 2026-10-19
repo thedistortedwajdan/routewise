@@ -2,7 +2,26 @@
 
 A cost-routing gateway for LLM applications. It sits between your app and your model providers, sends easy requests to cheap models and hard ones to strong models, caches repeats, and measures how much money you saved against how much quality you lost.
 
-> Status: early scaffold. Nothing is implemented yet.
+> Status: v0 proxy works end to end against the real Anthropic API (routing is manual for now).
+
+## Quick start
+
+```bash
+python -m venv .venv && source .venv/Scripts/activate
+pip install -e ".[dev]"
+cp .env.example .env          # add ANTHROPIC_API_KEY
+python -m routewise --port 8000
+```
+
+```bash
+curl localhost:8000/v1/chat/completions -H 'content-type: application/json'   -d '{"model":"cheap","messages":[{"role":"user","content":"Hello"}]}'
+curl localhost:8000/v1/stats
+```
+
+`model` can be `cheap`, `strong`, or anything else (the default tier is used). Every request is logged to SQLite with tokens, cost, latency and the route taken. A daily budget cap (`ROUTEWISE_DAILY_BUDGET_USD`, default $2) rejects requests with HTTP 429 once reached.
+
+Not supported yet: streaming, tool calling, images. Sampling params (`temperature`, `top_p`) are ignored because current Claude models reject non-default values.
+
 
 ## Why
 
@@ -23,7 +42,8 @@ client app ──▶ routewise gateway ──▶ difficulty router ──▶ che
 
 ## Roadmap
 
-- [ ] OpenAI-compatible proxy endpoint
+- [x] OpenAI-compatible proxy endpoint (non-streaming)
+- [x] Cost ledger + daily budget guard
 - [ ] Provider adapters (pluggable)
 - [ ] Exact + semantic cache
 - [ ] Difficulty router (rules first, learned classifier later)
