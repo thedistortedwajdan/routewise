@@ -64,7 +64,7 @@ async def run_tier(gw: Gateway, tier: str, examples: list[dict], conc: int) -> l
         async with sem:
             try:
                 r = await gw.complete(body)
-            except Exception as e:  # keep going; record the failure
+            except Exception as e:  # noqa: BLE001  keep going; record the failure
                 return {"number": ex["number"], "tier": tier, "truth": ex["truth"],
                         "pred": "error", "error": f"{type(e).__name__}: {e}"}
         return {

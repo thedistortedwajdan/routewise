@@ -18,7 +18,7 @@ import httpx
 
 def gh_token() -> str | None:
     try:
-        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=10)
+        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=10, check=False)
         return out.stdout.strip() or None
     except (OSError, subprocess.SubprocessError):
         return None
